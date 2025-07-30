@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Avançado de Análise de Cotações</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #c71d23 0%, #8b1419 100%);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #c71d23 0%, #8b1419 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(199, 29, 35, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: #4a5568;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .input-field {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #c71d23;
+            box-shadow: 0 0 0 4px rgba(199, 29, 35, 0.1);
+            background: white;
+        }
+        
+        .input-error {
+            border-color: #c71d23;
+        }
+        
+        .error-message {
+            color: #c71d23;
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+        
+        .table-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .table-header {
+            background: linear-gradient(135deg, #c71d23 0%, #8b1419 100%);
+            color: white;
+        }
+        
+        .table-row:hover {
+            background: rgba(199, 29, 35, 0.05);
+        }
+        
+        .stats-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .success-text { color: #48bb78; }
+        .danger-text { color: #c71d23; }
+        .warning-text { color: #ed8936; }
+        .primary-text { color: #c71d23; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 32px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .chart-container.visible {
+            opacity: 1;
+        }
+        
+        .dark-mode {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        }
+        
+        .dark-mode .glass-card {
+            background: rgba(45, 55, 72, 0.95);
+            color: #e2e8f0;
+        }
+        
+        .dark-mode .input-field {
+            background: rgba(45, 55, 72, 0.9);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #e2e8f0;
+        }
+        
+        .dark-mode .stats-card {
+            background: rgba(45, 55, 72, 0.9);
+            color: #e2e8f0;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success { background: #48bb78; }
+        .notification.error { background: #c71d23; }
+        .notification.warning { background: #ed8936; }
+        
+        .animate-pulse-custom {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .7; }
+        }
+
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            
+            .glass-card, .stats-card, .chart-container {
+                background: white !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+                color: black !important;
+            }
+            
+            .table-header {
+                background: #c71d23 !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact !important;
+            }
+            
+            .btn-primary, .btn-secondary {
+                display: none !important;
+            }
+            
+            .success-text { color: #22c55e !important; }
+            .danger-text { color: #c71d23 !important; }
+            .warning-text { color: #f59e0b !important; }
+            .primary-text { color: #c71d23 !important; }
+            
+            .chart-container canvas {
+                max-height: 300px !important;
+            }
+        }
+
+        .pdf-mode {
+            background: white !important;
+            color: black !important;
+        }
+        
+        .pdf-mode .glass-card, 
+        .pdf-mode .stats-card, 
+        .pdf-mode .chart-container {
+            background: white !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+            color: black !important;
+            border: 1px solid #e5e7eb !important;
+        }
+        
+        .pdf-mode .table-header {
+            background: #c71d23 !important;
+            color: white !important;
+        }
+        
+        .pdf-mode .btn-primary, 
+        .pdf-mode .btn-secondary {
+            display: none !important;
+        }
+        
+        .pdf-mode .success-text { color: #22c55e !important; font-weight: 600 !important; }
+        .pdf-mode .danger-text { color: #c71d23 !important; font-weight: 600 !important; }
+        .pdf-mode .warning-text { color: #f59e0b !important; font-weight: 600 !important; }
+        .pdf-mode .primary-text { color: #c71d23 !important; font-weight: 600 !important; }
+        
+        @media (max-width: 640px) {
+            .grid-cols-5, .grid-cols-4 {
+                grid-template-columns: 1fr;
+            }
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+            table {
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="glass-card p-6 mb-6">
+            <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                        <i class="fas fa-chart-line text-red-600 mr-3"></i>
+                        Sistema de Análise de Cotações
+                    </h1>
+                    <p class="text-gray-600">Análise inteligente e comparação automatizada de fornecedores</p>
+                </div>
+                <div class="flex gap-3 flex-wrap no-print">
+                    <button id="toggleDarkMode" class="btn-secondary" aria-label="Alternar modo escuro">
+                        <i class="fas fa-moon"></i> Modo Escuro
+                    </button>
+                    <button id="importBtn" class="btn-secondary" aria-label="Importar dados">
+                        <i class="fas fa-upload"></i> Importar
+                    </button>
+                    <button id="historyBtn" class="btn-secondary" aria-label="Ver histórico de cotações">
+                        <i class="fas fa-history"></i> Histórico
+                    </button>
+                    <button id="exportJsonBtn" class="btn-secondary" aria-label="Exportar dados em JSON">
+                        <i class="fas fa-download"></i> Exportar JSON
+                    </button>
+                    <button id="exportCsvBtn" class="btn-secondary" aria-label="Exportar dados em CSV">
+                        <i class="fas fa-file-csv"></i> Exportar CSV
+                    </button>
+                    <button id="exportPdfBtn" class="btn-primary" aria-label="Exportar como PDF">
+                        <i class="fas fa-file-pdf"></i> Exportar PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estatísticas Resumo -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="stats-card">
+                <div class="text-2xl font-bold primary-text" id="totalItems">0</div>
+                <div class="text-sm text-gray-600 mt-1">Total de Itens</div>
+            </div>
+            <div class="stats-card">
+                <div class="text-2xl font-bold success-text" id="totalSavings">R$ 0,00</div>
+                <div class="text-sm text-gray-600 mt-1">Economia Total</div>
+            </div>
+            <div class="stats-card">
+                <div class="text-2xl font-bold text-blue-600" id="bestSupplier">-</div>
+                <div class="text-sm text-gray-600 mt-1">Melhor Fornecedor</div>
+            </div>
+            <div class="stats-card">
+                <div class="text-2xl font-bold text-orange-600" id="avgDifference">0%</div>
+                <div class="text-sm text-gray-600 mt-1">Diferença Média</div>
+            </div>
+        </div>
+
+        <!-- Formulário de Fornecedores -->
+        <div class="glass-card p-6 mb-6 no-print">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-gray-800">
+                    <i class="fas fa-building text-blue-600 mr-2"></i>
+                    Gestão de Fornecedores
+                </h2>
+                <span class="text-sm text-gray-500">Máximo 5 fornecedores</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div>
+                    <input id="supplierName" class="input-field" type="text" placeholder="Nome do Fornecedor *" required aria-label="Nome do fornecedor">
+                    <p id="supplierNameError" class="error-message hidden"></p>
+                </div>
+                <div>
+                    <input id="supplierContact" class="input-field" type="text" placeholder="Contato" aria-label="Contato do fornecedor">
+                    <p id="supplierContactError" class="error-message hidden"></p>
+                </div>
+                <div>
+                    <input id="supplierPhone" class="input-field" type="text" placeholder="Telefone" aria-label="Telefone do fornecedor">
+                    <p id="supplierPhoneError" class="error-message hidden"></p>
+                </div>
+                <div>
+                    <input id="supplierEmail" class="input-field" type="email" placeholder="E-mail" aria-label="E-mail do fornecedor">
+                    <p id="supplierEmailError" class="error-message hidden"></p>
+                </div>
+                <button id="addSupplierBtn" class="btn-primary" aria-label="Adicionar fornecedor">
+                    <i class="fas fa-plus"></i> Adicionar
+                </button>
+            </div>
+        </div>
+
+        <!-- Formulário de Itens -->
+        <div class="glass-card p-6 mb-6 no-print">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                <i class="fas fa-box text-green-600 mr-2"></i>
+                Adicionar Item para Cotação
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <div>
+                    <input id="itemQuantity" class="input-field" type="number" placeholder="Quantidade *" min="0" required aria-label="Quantidade do item">
+                    <p id="itemQuantityError" class="error-message hidden"></p>
+                </div>
+                <div>
+                    <input id="itemUnit" class="input-field" type="text" placeholder="Unidade (ex.: PÇ) *" required aria-label="Unidade do item">
+                    <p id="itemUnitError" class="error-message hidden"></p>
+                </div>
+                <div>
+                    <input id="itemDescription" class="input-field" type="text" placeholder="Descrição do Item *" required aria-label="Descrição do item">
+                    <p id="itemDescriptionError" class="error-message hidden"></p>
+                </div>
+                <div>
+                    <input id="itemTargetPrice" class="input-field" type="number" placeholder="Preço Objetivo *" min="0" step="0.01" required aria-label="Preço objetivo do item">
+                    <p id="itemTargetPriceError" class="error-message hidden"></p>
+                </div>
+            </div>
+            <div id="priceInputs" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
+                <!-- Inputs de preços serão gerados dinamicamente -->
+            </div>
+            <div class="flex gap-3">
+                <button id="addItemBtn" class="btn-primary" aria-label="Adicionar item">
+                    <i class="fas fa-plus"></i> Adicionar Item
+                </button>
+                <button id="clearFormBtn" class="btn-secondary" aria-label="Limpar formulário">
+                    <i class="fas fa-trash"></i> Limpar
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabela de Fornecedores -->
+        <div class="glass-card p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                <i class="fas fa-users primary-text mr-2"></i>
+                Fornecedores Cadastrados
+            </h2>
+            <div class="table-container">
+                <table class="w-full" id="supplierTable">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="p-4 text-left">Nome</th>
+                            <th class="p-4 text-left">Contato</th>
+                            <th class="p-4 text-left">Telefone</th>
+                            <th class="p-4 text-left">E-mail</th>
+                            <th class="p-4 text-center no-print">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tabela de Comparação -->
+        <div class="glass-card p-6 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-gray-800">
+                    <i class="fas fa-balance-scale text-orange-600 mr-2"></i>
+                    Comparação de Preços
+                </h2>
+                <div class="flex gap-2 no-print">
+                    <button id="sortByPriceBtn" class="btn-secondary text-sm" aria-label="Ordenar por preço">
+                        <i class="fas fa-sort-amount-down"></i> Ordenar por Preço
+                    </button>
+                    <button id="filterItemsBtn" class="btn-secondary text-sm" aria-label="Filtrar itens">
+                        <i class="fas fa-filter"></i> Filtrar
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <div class="table-container">
+                    <table class="w-full" id="comparisonTable">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="p-4 text-left">Qtd</th>
+                                <th class="p-4 text-left">Un.</th>
+                                <th class="p-4 text-left">Descrição</th>
+                                <th class="p-4 text-center">Melhor Preço</th>
+                                <th class="p-4 text-center">Fornecedor</th>
+                                <th class="p-4 text-center">Objetivo</th>
+                                <th class="p-4 text-center">Diferença</th>
+                                <th class="p-4 text-center">Total</th>
+                                <th class="p-4 text-center no-print">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="chart-container" id="supplierChartContainer">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Comparação por Fornecedor</h3>
+                <canvas id="supplierChart"></canvas>
+            </div>
+            <div class="chart-container" id="savingsChartContainer">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Economia por Item</h3>
+                <canvas id="savingsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Relatório de Insights -->
+        <div class="glass-card p-6 mb-6" id="insightsPanel">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                Insights e Recomendações
+            </h2>
+            <div id="insightsContent" class="space-y-3">
+                <p class="text-gray-600">Adicione itens para ver insights automáticos...</p>
+            </div>
+        </div>
+
+        <!-- Resumo Final para PDF -->
+        <div class="glass-card p-6 mb-6" id="finalSummary">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                <i class="fas fa-clipboard-check primary-text mr-2"></i>
+                Resumo da Cotação
+            </h2>
+            <div id="summaryContent" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">Informações Gerais</h4>
+                    <div class="space-y-2 text-sm">
+                        <div>Data da análise: <span id="analysisDate" class="font-medium"></span></div>
+                        <div>Total de fornecedores: <span id="totalSuppliers" class="font-medium">0</span></div>
+                        <div>Total de itens analisados: <span id="summaryTotalItems" class="font-medium">0</span></div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">Resultados Financeiros</h4>
+                    <div class="space-y-2 text-sm">
+                        <div>Valor total estimado: <span id="totalValue" class="font-medium">R$ 0,00</span></div>
+                        <div>Economia/Excesso: <span id="summaryTotalSavings" class="font-medium">R$ 0,00</span></div>
+                        <div>Percentual de economia: <span id="savingsPercentage" class="font-medium">0%</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes do Item -->
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Detalhes do Item</h3>
+                <button class="text-gray-500 hover:text-gray-700" onclick="closeModal()" aria-label="Fechar modal">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Modal de Histórico -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Histórico de Cotações</h3>
+                <button class="text-gray-500 hover:text-gray-700" onclick="closeHistoryModal()" aria-label="Fechar modal de histórico">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="table-container">
+                <table class="w-full" id="historyTable">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="p-4 text-left">ID</th>
+                            <th class="p-4 text-left">Data</th>
+                            <th class="p-4 text-left">Fornecedores</th>
+                            <th class="p-4 text-left">Itens</th>
+                            <th class="p-4 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input de arquivo oculto -->
+    <input type="file" id="fileInput" accept=".json,.csv" style="display: none;">
+
+    <script>
+        let suppliers = [];
+        let comparisonData = [];
+        let supplierChart = null;
+        let savingsChart = null;
+
+        // Função de debounce
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Notificações
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'exclamation'}-circle mr-2"></i>${message}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 100);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 3000);
+        }
+
+        // Validação de campos com mensagem inline
+        function validateField(element, condition, message) {
+            const errorElement = document.getElementById(`${element.id}Error`);
+            if (!condition) {
+                element.classList.add('input-error');
+                errorElement.textContent = message;
+                errorElement.classList.remove('hidden');
+                return false;
+            }
+            element.classList.remove('input-error');
+            errorElement.classList.add('hidden');
+            return true;
+        }
+
+        // Sanitização de entrada
+        function sanitizeInput(text) {
+            return text.replace(/<[^>]*>/g, '');
+        }
+
+        // Gerar UUID
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Funções de histórico
+        function saveQuotation() {
+            if (suppliers.length === 0 && comparisonData.length === 0) {
+                showNotification("Nenhum dado para salvar no histórico", "error");
+                return;
+            }
+            const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+            const quotation = {
+                id: generateUUID(),
+                date: new Date().toLocaleString('pt-BR'),
+                suppliers: suppliers,
+                comparisonData: comparisonData
+            };
+            history.push(quotation);
+            localStorage.setItem('quotationHistory', JSON.stringify(history));
+            showNotification("Cotação salva no histórico!");
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+            const tbody = document.querySelector("#historyTable tbody");
+            tbody.innerHTML = '';
+
+            history.forEach((quotation, index) => {
+                const tr = document.createElement("tr");
+                tr.className = 'table-row transition-colors duration-200';
+                tr.innerHTML = `
+                    <td class="p-4">${quotation.id}</td>
+                    <td class="p-4">${quotation.date}</td>
+                    <td class="p-4">${quotation.suppliers.length}</td>
+                    <td class="p-4">${quotation.comparisonData.length}</td>
+                    <td class="p-4 text-center">
+                        <button onclick="restoreQuotation(${index})" class="text-blue-500 hover:text-blue-700 mr-2" aria-label="Restaurar cotação">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button onclick="deleteQuotation(${index})" class="text-red-500 hover:text-red-700" aria-label="Excluir cotação">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function restoreQuotation(index) {
+            const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+            const quotation = history[index];
+            if (quotation) {
+                suppliers = quotation.suppliers;
+                comparisonData = quotation.comparisonData;
+                updateSupplierTable();
+                updateComparisonTable();
+                closeHistoryModal();
+                showNotification("Cotação restaurada com sucesso!");
+            }
+        }
+
+        function deleteQuotation(index) {
+            if (confirm('Tem certeza que deseja excluir esta cotação do histórico?')) {
+                const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+                history.splice(index, 1);
+                localStorage.setItem('quotationHistory', JSON.stringify(history));
+                loadHistory();
+                showNotification("Cotação excluída do histórico!");
+            }
+        }
+
+        function showHistoryModal() {
+            loadHistory();
+            document.getElementById('historyModal').style.display = 'block';
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal').style.display = 'none';
+        }
+
+        // Atualizar inputs de preços baseado nos fornecedores
+        function updatePriceInputs() {
+            const container = document.getElementById('priceInputs');
+            container.innerHTML = '';
+            
+            suppliers.forEach((supplier, index) => {
+                const div = document.createElement('div');
+                const input = document.createElement('input');
+                input.className = 'input-field';
+                input.type = 'number';
+                input.id = `itemPrice${index + 1}`;
+                input.placeholder = `${supplier.nome} (R$)`;
+                input.min = '0';
+                input.step = '0.01';
+                input.addEventListener('input', debounce(() => validateField(input, parseFloat(input.value) >= 0, "Preço inválido"), 300));
+                div.appendChild(input);
+                div.innerHTML += `<p id="itemPrice${index + 1}Error" class="error-message hidden"></p>`;
+                container.appendChild(div);
+            });
+        }
+
+        // Calcular estatísticas
+        function updateStats() {
+            const totalItems = comparisonData.length;
+            let totalSavings = 0;
+            let totalValue = 0;
+            let supplierWins = {};
+            let totalDifference = 0;
+
+            comparisonData.forEach(item => {
+                const prices = item.prices.filter(p => p.price > 0);
+                if (prices.length > 0) {
+                    const bestPrice = Math.min(...prices.map(p => p.price));
+                    const bestSupplier = prices.find(p => p.price === bestPrice).supplier;
+                    const saving = (item.targetPrice - bestPrice) * item.quantity;
+                    const difference = ((bestPrice / item.targetPrice) - 1) * 100;
+                    const itemTotal = bestPrice * item.quantity;
+                    
+                    totalSavings += saving;
+                    totalValue += itemTotal;
+                    totalDifference += Math.abs(difference);
+                    supplierWins[bestSupplier] = (supplierWins[bestSupplier] || 0) + 1;
+                }
+            });
+
+            const bestSupplier = Object.keys(supplierWins).reduce((a, b) => 
+                supplierWins[a] > supplierWins[b] ? a : b, '-');
+
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('totalSavings').textContent = 
+                totalSavings.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('bestSupplier').textContent = bestSupplier;
+            document.getElementById('avgDifference').textContent = 
+                totalItems > 0 ? `${(totalDifference / totalItems).toFixed(1)}%` : '0%';
+
+            // Atualizar resumo final
+            document.getElementById('analysisDate').textContent = new Date().toLocaleDateString('pt-BR');
+            document.getElementById('totalSuppliers').textContent = suppliers.length;
+            document.getElementById('summaryTotalItems').textContent = totalItems;
+            document.getElementById('totalValue').textContent = 
+                totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('summaryTotalSavings').textContent = 
+                totalSavings.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('savingsPercentage').textContent = 
+                totalValue > 0 ? `${((totalSavings / totalValue) * 100).toFixed(1)}%` : '0%';
+        }
+
+        // Gerar insights automáticos
+        function generateInsights() {
+            const container = document.getElementById('insightsContent');
+            container.innerHTML = '';
+
+            if (comparisonData.length === 0) {
+                container.innerHTML = '<p class="text-gray-600">Adicione itens para ver insights automáticos...</p>';
+                return;
+            }
+
+            const insights = [];
+            let supplierWins = {};
+            let totalSavings = 0;
+            let itemsAboveTarget = 0;
+
+            comparisonData.forEach(item => {
+                const prices = item.prices.filter(p => p.price > 0);
+                if (prices.length > 0) {
+                    const bestPrice = Math.min(...prices.map(p => p.price));
+                    const bestSupplier = prices.find(p => p.price === bestPrice).supplier;
+                    const saving = (item.targetPrice - bestPrice) * item.quantity;
+                    
+                    totalSavings += saving;
+                    supplierWins[bestSupplier] = (supplierWins[bestSupplier] || 0) + 1;
+                    
+                    if (bestPrice > item.targetPrice) itemsAboveTarget++;
+                }
+            });
+
+            const topSupplier = Object.keys(supplierWins).reduce((a, b) => 
+                supplierWins[a] > supplierWins[b] ? a : b, null);
+            
+            if (topSupplier) {
+                insights.push({
+                    icon: 'fas fa-crown',
+                    text: `${topSupplier} oferece os melhores preços em ${supplierWins[topSupplier]} item(ns)`,
+                    type: 'success'
+                });
+            }
+
+            if (totalSavings > 0) {
+                insights.push({
+                    icon: 'fas fa-piggy-bank',
+                    text: `Economia total possível: ${totalSavings.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`,
+                    type: 'success'
+                });
+            } else if (totalSavings < 0) {
+                insights.push({
+                    icon: 'fas fa-exclamation-triangle',
+                    text: `Orçamento pode exceder em ${Math.abs(totalSavings).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`,
+                    type: 'warning'
+                });
+            }
+
+            if (itemsAboveTarget > 0) {
+                insights.push({
+                    icon: 'fas fa-chart-line',
+                    text: `${itemsAboveTarget} item(ns) estão acima do preço objetivo. Considere negociar com os fornecedores.`,
+                    type: 'warning'
+                });
+            }
+
+            insights.forEach(insight => {
+                const div = document.createElement('div');
+                div.className = `flex items-center gap-3 p-3 rounded-lg ${
+                    insight.type === 'success' ? 'bg-green-50 text-green-700' :
+                    insight.type === 'warning' ? 'bg-yellow-50 text-yellow-700' :
+                    'bg-blue-50 text-blue-700'
+                }`;
+                div.innerHTML = `<i class="${insight.icon}"></i><span>${insight.text}</span>`;
+                container.appendChild(div);
+            });
+        }
+
+        // Atualizar tabela de fornecedores
+        function updateSupplierTable() {
+            const tbody = document.querySelector("#supplierTable tbody");
+            tbody.innerHTML = '';
+            
+            suppliers.forEach((supplier, index) => {
+                const tr = document.createElement("tr");
+                tr.className = 'table-row transition-colors duration-200';
+                tr.innerHTML = `
+                    <td class="p-4 font-medium">${supplier.nome}</td>
+                    <td class="p-4">${supplier.contato || '-'}</td>
+                    <td class="p-4">${supplier.telefone || '-'}</td>
+                    <td class="p-4">${supplier.email || '-'}</td>
+                    <td class="p-4 text-center no-print">
+                        <button onclick="removeSupplier(${index})" class="text-red-500 hover:text-red-700 transition-colors" aria-label="Remover fornecedor">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            updatePriceInputs();
+        }
+
+        // Atualizar tabela de comparação
+        function updateComparisonTable() {
+            const tbody = document.querySelector("#comparisonTable tbody");
+            tbody.innerHTML = '';
+            
+            comparisonData.forEach((item, index) => {
+                const prices = item.prices.filter(p => p.price > 0);
+                let bestPrice = 0, bestSupplier = '-', difference = 0, total = 0;
+                
+                if (prices.length > 0) {
+                    bestPrice = Math.min(...prices.map(p => p.price));
+                    bestSupplier = prices.find(p => p.price === bestPrice).supplier;
+                    difference = ((bestPrice / item.targetPrice) - 1) * 100;
+                    total = bestPrice * item.quantity;
+                }
+
+                const tr = document.createElement("tr");
+                tr.className = 'table-row transition-colors duration-200';
+                tr.innerHTML = `
+                    <td class="p-4">${item.quantity}</td>
+                    <td class="p-4">${item.unit}</td>
+                    <td class="p-4 font-medium">${item.description}</td>
+                    <td class="p-4 text-center font-bold ${bestPrice > 0 ? 'text-green-600' : 'text-gray-400'}">
+                        ${bestPrice > 0 ? bestPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}
+                    </td>
+                    <td class="p-4 text-center">${bestSupplier}</td>
+                    <td class="p-4 text-center">${item.targetPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td class="p-4 text-center font-bold ${difference < 0 ? 'success-text' : difference > 0 ? 'danger-text' : 'text-gray-600'}">
+                        ${difference !== 0 ? `${difference.toFixed(1)}%` : '-'}
+                    </td>
+                    <td class="p-4 text-center font-bold">
+                        ${total > 0 ? total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}
+                    </td>
+                    <td class="p-4 text-center no-print">
+                        <button onclick="showItemDetails(${index})" class="text-blue-500 hover:text-blue-700 mr-2" aria-label="Ver detalhes do item">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="removeItem(${index})" class="text-red-500 hover:text-red-700" aria-label="Remover item">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            updateStats();
+            updateCharts();
+            generateInsights();
+            saveQuotation(); // Salvar automaticamente após atualizar a tabela
+        }
+
+        // Lazy loading de gráficos
+        function lazyLoadCharts() {
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        if (entry.target.id === 'supplierChartContainer' && !supplierChart) {
+                            updateSupplierChart();
+                        } else if (entry.target.id === 'savingsChartContainer' && !savingsChart) {
+                            updateSavingsChart();
+                        }
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.chart-container').forEach(container => {
+                observer.observe(container);
+            });
+        }
+
+        // Atualizar gráficos
+        function updateCharts() {
+            if (document.getElementById('supplierChartContainer').classList.contains('visible')) {
+                updateSupplierChart();
+            }
+            if (document.getElementById('savingsChartContainer').classList.contains('visible')) {
+                updateSavingsChart();
+            }
+        }
+
+        function updateSupplierChart() {
+            const ctx = document.getElementById('supplierChart').getContext('2d');
+            if (supplierChart) supplierChart.destroy();
+
+            let supplierData = {};
+            comparisonData.forEach(item => {
+                item.prices.forEach(priceItem => {
+                    if (priceItem.price > 0) {
+                        if (!supplierData[priceItem.supplier]) {
+                            supplierData[priceItem.supplier] = [];
+                        }
+                        supplierData[priceItem.supplier].push(priceItem.price);
+                    }
+                });
+            });
+
+            const labels = Object.keys(supplierData);
+            const avgPrices = labels.map(supplier => {
+                const prices = supplierData[supplier];
+                return prices.reduce((a, b) => a + b, 0) / prices.length;
+            });
+
+            supplierChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: avgPrices,
+                        backgroundColor: [
+                            '#c71d23', '#8b1419', '#f56565', '#fed7d7', '#fbb6ce',
+                            '#f687b3', '#ed64a6', '#d53f8c', '#b83280', '#97266d'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { 
+                                padding: 20, 
+                                usePointStyle: true,
+                                font: { size: 12, weight: '500' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateSavingsChart() {
+            const ctx = document.getElementById('savingsChart').getContext('2d');
+            if (savingsChart) savingsChart.destroy();
+
+            const labels = comparisonData.map((item, index) => 
+                item.description.length > 15 ? 
+                item.description.substring(0, 15) + '...' : 
+                item.description
+            );
+            const savings = comparisonData.map(item => {
+                const prices = item.prices.filter(p => p.price > 0);
+                if (prices.length > 0) {
+                    const bestPrice = Math.min(...prices.map(p => p.price));
+                    return (item.targetPrice - bestPrice) * item.quantity;
+                }
+                return 0;
+            });
+
+            savingsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Economia/Excesso (R$)',
+                        data: savings,
+                        backgroundColor: savings.map(s => s >= 0 ? '#48bb78' : '#c71d23'),
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        borderWidth: 1,
+                        borderColor: savings.map(s => s >= 0 ? '#38a169' : '#9b1c1c')
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f7fafc' },
+                            ticks: {
+                                font: { size: 11 },
+                                callback: function(value) {
+                                    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                                }
+                            }
+                        },
+                        x: { 
+                            grid: { display: false },
+                            ticks: { 
+                                maxRotation: 45,
+                                font: { size: 10 }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.parsed.y >= 0 ? 'Economia' : 'Excesso'}: ${Math.abs(context.parsed.y).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Funções de manipulação de dados
+        function removeSupplier(index) {
+            if (confirm('Tem certeza que deseja remover este fornecedor?')) {
+                suppliers.splice(index, 1);
+                updateSupplierTable();
+                updateComparisonTable();
+                showNotification('Fornecedor removido com sucesso!');
+            }
+        }
+
+        function removeItem(index) {
+            if (confirm('Tem certeza que deseja remover este item?')) {
+                comparisonData.splice(index, 1);
+                updateComparisonTable();
+                showNotification('Item removido com sucesso!');
+            }
+        }
+
+        function showItemDetails(index) {
+            const item = comparisonData[index];
+            const modal = document.getElementById('itemModal');
+            const content = document.getElementById('modalContent');
+            
+            let detailsHTML = `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                            <p class="text-lg font-semibold">${item.description}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
+                            <p class="text-lg">${item.quantity} ${item.unit}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Preços por Fornecedor</label>
+                        <div class="space-y-2">
+            `;
+            
+            item.prices.forEach(priceItem => {
+                if (priceItem.price > 0) {
+                    const isLowest = priceItem.price === Math.min(...item.prices.filter(p => p.price > 0).map(p => p.price));
+                    detailsHTML += `
+                        <div class="flex justify-between items-center p-3 rounded-lg ${isLowest ? 'bg-green-50 border border-green-200' : 'bg-gray-50'}">
+                            <span class="font-medium ${isLowest ? 'text-green-700' : ''}">${priceItem.supplier}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold ${isLowest ? 'text-green-600' : ''}">${priceItem.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                                ${isLowest ? '<i class="fas fa-crown text-yellow-500"></i>' : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            const bestPrice = Math.min(...item.prices.filter(p => p.price > 0).map(p => p.price));
+            const total = bestPrice * item.quantity;
+            const saving = (item.targetPrice - bestPrice) * item.quantity;
+            
+            detailsHTML += `
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 pt-4 border-t">
+                        <div class="text-center">
+                            <div class="text-sm text-gray-600">Preço Objetivo</div>
+                            <div class="text-lg font-bold">${item.targetPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-sm text-gray-600">Total</div>
+                            <div class="text-lg font-bold text-blue-600">${total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-sm text-gray-600">${saving >= 0 ? 'Economia' : 'Excesso'}</div>
+                            <div class="text-lg font-bold ${saving >= 0 ? 'text-green-600' : 'text-red-600'}">${Math.abs(saving).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            content.innerHTML = detailsHTML;
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('itemModal').style.display = 'none';
+        }
+
+        // Exportação PDF
+        function exportPDF() {
+            const element = document.querySelector(".max-w-7xl");
+            const originalClass = document.body.className;
+            
+            showNotification('Preparando PDF...', 'warning');
+            
+            document.body.className = originalClass + ' pdf-mode';
+            
+            setTimeout(() => {
+                const opt = {
+                    margin: [0.5, 0.5, 0.5, 0.5],
+                    filename: `analise_cotacao_${new Date().toISOString().split('T')[0]}.pdf`,
+                    image: { type: 'jpeg', quality: 0.95 },
+                    html2canvas: { 
+                        scale: 1.5,
+                        useCORS: true,
+                        letterRendering: true,
+                        allowTaint: false,
+                        backgroundColor: '#ffffff',
+                        logging: false,
+                        width: element.scrollWidth,
+                        height: element.scrollHeight
+                    },
+                    jsPDF: { 
+                        unit: 'in', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: true
+                    },
+                    pagebreak: { 
+                        mode: ['avoid-all', 'css', 'legacy'],
+                        before: '.glass-card',
+                        after: '.chart-container'
+                    }
+                };
+                
+                html2pdf().set(opt).from(element).save().then(() => {
+                    document.body.className = originalClass;
+                    showNotification("PDF exportado com sucesso!");
+                }).catch((error) => {
+                    console.error('Erro ao exportar PDF:', error);
+                    document.body.className = originalClass;
+                    showNotification("Erro ao exportar PDF", "error");
+                });
+            }, 500);
+        }
+
+        // Exportação JSON
+        function exportData() {
+            const data = {
+                suppliers: suppliers,
+                comparisonData: comparisonData,
+                exportDate: new Date().toISOString(),
+                version: "2.0"
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `cotacao_dados_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Dados JSON exportados com sucesso!');
+        }
+
+        // Exportação CSV
+        function exportCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Quantidade,Unidade,Descrição,Melhor Preço,Fornecedor,Preço Objetivo,Diferença,Total\n";
+            
+            comparisonData.forEach(item => {
+                const prices = item.prices.filter(p => p.price > 0);
+                const bestPrice = prices.length > 0 ? Math.min(...prices.map(p => p.price)) : 0;
+                const bestSupplier = prices.length > 0 ? prices.find(p => p.price === bestPrice).supplier : '-';
+                const difference = prices.length > 0 ? ((bestPrice / item.targetPrice) - 1) * 100 : 0;
+                const total = bestPrice * item.quantity;
+                
+                const row = [
+                    item.quantity,
+                    item.unit,
+                    `"${item.description}"`,
+                    bestPrice.toFixed(2),
+                    `"${bestSupplier}"`,
+                    item.targetPrice.toFixed(2),
+                    difference.toFixed(1),
+                    total.toFixed(2)
+                ].join(",");
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `cotacao_dados_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Dados CSV exportados com sucesso!');
+        }
+
+        // Importação de CSV
+        function importCSV(content) {
+            const rows = content.split('\n').slice(1).filter(row => row.trim());
+            comparisonData = rows.map(row => {
+                const [quantity, unit, description, bestPrice, supplier, targetPrice] = row.split(',').map(val => val.replace(/^"|"$/g, ''));
+                return {
+                    quantity: parseInt(quantity),
+                    unit,
+                    description,
+                    targetPrice: parseFloat(targetPrice),
+                    prices: suppliers.map(s => ({
+                        supplier: s.nome,
+                        price: s.nome === supplier ? parseFloat(bestPrice) : 0
+                    }))
+                };
+            });
+            updateComparisonTable();
+        }
+
+        // Event listeners
+        document.getElementById("addSupplierBtn").addEventListener("click", () => {
+            const nameInput = document.getElementById("supplierName");
+            const contactInput = document.getElementById("supplierContact");
+            const phoneInput = document.getElementById("supplierPhone");
+            const emailInput = document.getElementById("supplierEmail");
+
+            const name = sanitizeInput(nameInput.value.trim());
+            const contact = sanitizeInput(contactInput.value.trim());
+            const phone = sanitizeInput(phoneInput.value.trim());
+            const email = sanitizeInput(emailInput.value.trim());
+
+            if (!validateField(nameInput, name, "Nome do fornecedor é obrigatório")) return;
+            if (suppliers.length >= 5) {
+                showNotification("Máximo de 5 fornecedores permitido", "error");
+                return;
+            }
+            if (suppliers.some(s => s.nome.toLowerCase() === name.toLowerCase())) {
+                showNotification("Fornecedor já cadastrado", "error");
+                return;
+            }
+
+            suppliers.push({ nome: name, contato: contact, telefone: phone, email: email });
+            updateSupplierTable();
+            showNotification("Fornecedor adicionado com sucesso!");
+
+            nameInput.value = '';
+            contactInput.value = '';
+            phoneInput.value = '';
+            emailInput.value = '';
+        });
+
+        document.getElementById("addItemBtn").addEventListener("click", () => {
+            const quantityInput = document.getElementById("itemQuantity");
+            const unitInput = document.getElementById("itemUnit");
+            const descriptionInput = document.getElementById("itemDescription");
+            const targetPriceInput = document.getElementById("itemTargetPrice");
+
+            const quantity = parseInt(quantityInput.value);
+            const unit = sanitizeInput(unitInput.value.trim());
+            const description = sanitizeInput(descriptionInput.value.trim());
+            const targetPrice = parseFloat(targetPriceInput.value);
+
+            if (!validateField(descriptionInput, description, "Descrição é obrigatória")) return;
+            if (!validateField(unitInput, unit, "Unidade é obrigatória")) return;
+            if (!validateField(quantityInput, !isNaN(quantity) && quantity > 0, "Quantidade deve ser maior que 0")) return;
+            if (!validateField(targetPriceInput, !isNaN(targetPrice) && targetPrice > 0, "Preço objetivo deve ser maior que 0")) return;
+
+            const prices = [];
+            let hasValidPrice = false;
+
+            suppliers.forEach((supplier, index) => {
+                const priceInput = document.getElementById(`itemPrice${index + 1}`);
+                const price = parseFloat(priceInput.value) || 0;
+                prices.push({ supplier: supplier.nome, price: price });
+                if (price > 0) hasValidPrice = true;
+            });
+
+            if (!hasValidPrice) {
+                showNotification("Informe pelo menos um preço de fornecedor", "error");
+                return;
+            }
+
+            comparisonData.push({
+                quantity: quantity,
+                unit: unit,
+                description: description,
+                targetPrice: targetPrice,
+                prices: prices
+            });
+
+            updateComparisonTable();
+            showNotification("Item adicionado com sucesso!");
+
+            quantityInput.value = '';
+            unitInput.value = '';
+            descriptionInput.value = '';
+            targetPriceInput.value = '';
+            suppliers.forEach((_, index) => {
+                document.getElementById(`itemPrice${index + 1}`).value = '';
+            });
+        });
+
+        document.getElementById("clearFormBtn").addEventListener("click", () => {
+            document.getElementById("itemQuantity").value = '';
+            document.getElementById("itemUnit").value = '';
+            document.getElementById("itemDescription").value = '';
+            document.getElementById("itemTargetPrice").value = '';
+            suppliers.forEach((_, index) => {
+                const input = document.getElementById(`itemPrice${index + 1}`);
+                if (input) input.value = '';
+            });
+            document.querySelectorAll('.input-field').forEach(input => input.classList.remove('input-error'));
+            document.querySelectorAll('.error-message').forEach(error => error.classList.add('hidden'));
+        });
+
+        document.getElementById("sortByPriceBtn").addEventListener("click", () => {
+            comparisonData.sort((a, b) => {
+                const aPrices = a.prices.filter(p => p.price > 0);
+                const bPrices = b.prices.filter(p => p.price > 0);
+                const aMin = aPrices.length > 0 ? Math.min(...aPrices.map(p => p.price)) : Infinity;
+                const bMin = bPrices.length > 0 ? Math.min(...bPrices.map(p => p.price)) : Infinity;
+                return aMin - bMin;
+            });
+            updateComparisonTable();
+            showNotification("Tabela ordenada por preço!");
+        });
+
+        document.getElementById("exportPdfBtn").addEventListener("click", exportPDF);
+        document.getElementById("exportJsonBtn").addEventListener("click", exportData);
+        document.getElementById("exportCsvBtn").addEventListener("click", exportCSV);
+        document.getElementById("historyBtn").addEventListener("click", showHistoryModal);
+
+        document.getElementById("toggleDarkMode").addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+            const btn = document.getElementById("toggleDarkMode");
+            const isDark = document.body.classList.contains("dark-mode");
+            btn.innerHTML = isDark ? 
+                '<i class="fas fa-sun"></i> Modo Claro' : 
+                '<i class="fas fa-moon"></i> Modo Escuro';
+            localStorage.setItem('darkMode', isDark);
+        });
+
+        document.getElementById("importBtn").addEventListener("click", () => {
+            document.getElementById("fileInput").click();
+        });
+
+        document.getElementById("fileInput").addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const content = e.target.result;
+                    if (file.name.endsWith('.json')) {
+                        const data = JSON.parse(content);
+                        if (data.suppliers) suppliers = data.suppliers;
+                        if (data.comparisonData) comparisonData = data.comparisonData;
+                    } else if (file.name.endsWith('.csv')) {
+                        importCSV(content);
+                    }
+                    
+                    updateSupplierTable();
+                    updateComparisonTable();
+                    showNotification("Dados importados com sucesso!");
+                } catch (error) {
+                    showNotification("Erro ao importar arquivo", "error");
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Filtro de itens
+        document.getElementById("filterItemsBtn").addEventListener("click", () => {
+            const filter = prompt("Filtrar por (deixe vazio para mostrar todos):\n1. 'economia' - itens com economia\n2. 'excesso' - itens acima do objetivo\n3. texto - buscar na descrição", "");
+            
+            if (filter === null) return;
+            
+            const tbody = document.querySelector("#comparisonTable tbody");
+            const rows = Array.from(tbody.children);
+            
+            rows.forEach((row, index) => {
+                const item = comparisonData[index];
+                const prices = item.prices.filter(p => p.price > 0);
+                let show = true;
+                
+                if (filter.trim()) {
+                    if (filter.toLowerCase() === 'economia') {
+                        if (prices.length > 0) {
+                            const bestPrice = Math.min(...prices.map(p => p.price));
+                            show = bestPrice < item.targetPrice;
+                        } else {
+                            show = false;
+                        }
+                    } else if (filter.toLowerCase() === 'excesso') {
+                        if (prices.length > 0) {
+                            const bestPrice = Math.min(...prices.map(p => p.price));
+                            show = bestPrice > item.targetPrice;
+                        } else {
+                            show = false;
+                        }
+                    } else {
+                        show = item.description.toLowerCase().includes(filter.toLowerCase());
+                    }
+                }
+                
+                row.style.display = show ? '' : 'none';
+            });
+            
+            showNotification(`Filtro aplicado: ${filter || 'todos os itens'}`);
+        });
+
+        // Fechar modais clicando fora
+        window.onclick = function(event) {
+            const itemModal = document.getElementById('itemModal');
+            const historyModal = document.getElementById('historyModal');
+            if (event.target === itemModal) {
+                closeModal();
+            }
+            if (event.target === historyModal) {
+                closeHistoryModal();
+            }
+        }
+
+        // Inicialização
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.getElementById("toggleDarkMode").innerHTML = '<i class="fas fa-sun"></i> Modo Claro';
+        }
+        updateSupplierTable();
+        updateComparisonTable();
+        lazyLoadCharts();
+    </script>
+</body>
+</html>
