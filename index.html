@@ -156,7 +156,7 @@
             animation: modalSlideIn 0.3s ease;
         }
         
-        @keyframes modalSlideInRASD{
+        @keyframes modalSlideIn {
             from { opacity: 0; transform: translateY(-50px); }
             to { opacity: 1; transform: translateY(0); }
         }
@@ -180,71 +180,18 @@
         
         .dark-mode .glass-card {
             background: rgba(45, 55, 72, 0.95);
-            color: #f7fafc;
+            color: #e2e8f0;
         }
         
         .dark-mode .input-field {
             background: rgba(45, 55, 72, 0.9);
             border-color: rgba(255, 255, 255, 0.2);
-            color: #f7fafc;
+            color: #e2e8f0;
         }
         
         .dark-mode .stats-card {
             background: rgba(45, 55, 72, 0.9);
-            color: #f7fafc;
-        }
-        
-        .dark-mode .table-header {
-            background: linear-gradient(135deg, #c71d23 0%, #8b1419 100%);
-            color: white;
-        }
-        
-        .dark-mode .table-row:hover {
-            background: rgba(199, 29, 35, 0.1);
-        }
-        
-        .dark-mode .success-text { color: #9ae6b3; }
-        .dark-mode .danger-text { color: #feb2b2; }
-        .dark-mode .warning-text { color: #fbd38d; }
-        .dark-mode .primary-text { color: #feb2b2; }
-        
-        .dark-mode .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
             color: #e2e8f0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .dark-mode .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .dark-mode .modal-content {
-            background: #2d3748;
-            color: #f7fafc;
-        }
-        
-        .dark-mode .chart-container {
-            background: #2d3748;
-        }
-        
-        .dark-mode .text-gray-600 {
-            color: #a0aec0;
-        }
-        
-        .dark-mode .text-gray-700 {
-            color: #cbd5e0;
-        }
-        
-        .dark-mode .text-gray-800 {
-            color: #e2e8f0;
-        }
-        
-        .dark-mode .text-blue-500 {
-            color: #63b3ed;
-        }
-        
-        .dark-mode .text-red-500 {
-            color: #feb2b2;
         }
         
         .notification {
@@ -940,7 +887,7 @@
                 let bestPrice = 0, bestSupplier = '-', difference = 0, total = 0;
                 
                 if (prices.length > 0) {
-                    bestPrice = Math antennas(...prices.map(p => p.price));
+                    bestPrice = Math.min(...prices.map(p => p.price));
                     bestSupplier = prices.find(p => p.price === bestPrice).supplier;
                     difference = ((bestPrice / item.targetPrice) - 1) * 100;
                     total = bestPrice * item.quantity;
