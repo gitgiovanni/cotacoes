@@ -338,34 +338,51 @@
         </div>
 
         <!-- Detalhes da Cotação -->
-        <div class="glass-card p-6 mb-6 no-print">
+               <div class="glass-card p-6 mb-6 no-print">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">
                 <i class="fas fa-wallet text-blue-600 mr-2"></i>
                 Detalhes da Cotação
             </h2>
             <div class="flex flex-col gap-4">
-                <select id="paymentCondition" class="input-field" aria-label="Condição de Pagamento">
-                    <option value="">Selecione...</option>
-                    <option value="Cash">Dinheiro</option>
-                    <option value="Credit Card">Cartão de Crédito</option>
-                    <option value="Bank Transfer">Transferência Bancária</option>
-                    <option value="Others">Outros</option>
-                </select>
-                <input id="otherPaymentCondition" class="input-field hidden" type="text" placeholder="Especifique a condição" aria-label="Especifique a condição de pagamento">
-                <select id="downPayment" class="input-field" aria-label="Entrada">
-                    <option value="">Selecione...</option>
-                    <option value="Sim">Sim</option>
-                    <option value="Não">Não</option>
-                </select>
-                <div id="downPaymentDetails" class="hidden flex flex-col gap-4">
-                    <input id="downPaymentAmount" class="input-field" type="number" placeholder="Valor da Entrada" min="0" step="0.01" aria-label="Valor da Entrada">
-                    <input id="downPaymentDate" class="input-field" type="date" aria-label="Data do Pagamento do Sinal">
+                <div>
+                    <label for="paymentCondition" class="block text-sm font-medium text-gray-700 mb-1">Condição de Pagamento</label>
+                    <select id="paymentCondition" class="input-field" aria-label="Condição de Pagamento">
+                        <option value="">Selecione...</option>
+                        <option value="Cash">Dinheiro</option>
+                        <option value="Credit Card">Cartão de Crédito</option>
+                        <option value="Bank Transfer">Transferência Bancária</option>
+                        <option value="Others">Outros</option>
+                    </select>
                 </div>
-                <select id="branch" class="input-field" aria-label="Filial">
-                    <option value="">Selecione a Filial</option>
-                    <option value="01">01-FILIAL 01 - STA.IFIGÊNIA, 625 (SÃO PAULO)</option>
-                    <option value="02">02-FILIAL 02 - STA.IFIGÊNIA 517 (SÃO PAULO)</option>
-                    <option value="03">03-FILIAL 03 - CASA VERDE 3031 (SÃO PAULO)</option>
+                <div id="otherPaymentConditionContainer" class="hidden">
+                    <label for="otherPaymentCondition" class="block text-sm font-medium text-gray-700 mb-1">Especifique a Condição</label>
+                    <input id="otherPaymentCondition" class="input-field" type="text" placeholder="Especifique a condição" aria-label="Especifique a condição de pagamento">
+                </div>
+                <div>
+                    <label for="downPayment" class="block text-sm font-medium text-gray-700 mb-1">Entrada</label>
+                    <select id="downPayment" class="input-field" aria-label="Entrada">
+                        <option value="">Selecione...</option>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
+                    </select>
+                </div>
+                <div id="downPaymentDetails" class="hidden flex flex-col gap-4">
+                    <div>
+                        <label for="downPaymentAmount" class="block text-sm font-medium text-gray-700 mb-1">Valor da Entrada</label>
+                        <input id="downPaymentAmount" class="input-field" type="number" placeholder="Valor da Entrada" min="0" step="0.01" aria-label="Valor da Entrada">
+                    </div>
+                    <div>
+                        <label for="downPaymentDate" class="block text-sm font-medium text-gray-700 mb-1">Data do Pagamento do Sinal</label>
+                        <input id="downPaymentDate" class="input-field" type="date" aria-label="Data do Pagamento do Sinal">
+                    </div>
+                </div>
+                <div>
+                    <label for="branch" class="block text-sm font-medium text-gray-700 mb-1">Filial</label>
+                    <select id="branch" class="input-field" aria-label="Filial">
+                        <option value="">Selecione a Filial</option>
+                        <option value="01">01-FILIAL 01 - STA.IFIGÊNIA, 625 (SÃO PAULO)</option>
+                        <option value="02">02-FILIAL 02 - STA.IFIGÊNIA 517 (SÃO PAULO)</option>
+                        <option value="03">03-FILIAL 03 - CASA VERDE 3031 (SÃO PAULO)</option>
                     <option value="04">04-FILIAL 04 - General Osório, 282 (SÃO PAULO - GUARULHOS)</option>
                     <option value="05">05-FILIAL 05 - Quinze de Novembro, 3935 (JOINVILLE)</option>
                     <option value="06">06-FILIAL 06 - JOÃO BETTEGA 4801 (CURITIBA)</option>
