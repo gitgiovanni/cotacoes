@@ -330,7 +330,58 @@
                     <button id="exportPdfBtn" class="btn-primary" aria-label="Exportar como PDF">
                         <i class="fas fa-file-pdf"></i> Exportar PDF
                     </button>
+                    <button id="clearAllBtn" class="btn-secondary" aria-label="Limpar todos os dados">
+                        <i class="fas fa-trash"></i> Limpar Tudo
+                    </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Detalhes da Cotação -->
+        <div class="glass-card p-6 mb-6 no-print">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                <i class="fas fa-wallet text-blue-600 mr-2"></i>
+                Detalhes da Cotação
+            </h2>
+            <div class="flex flex-col gap-4">
+                <select id="paymentCondition" class="input-field" aria-label="Condição de Pagamento">
+                    <option value="">Selecione...</option>
+                    <option value="Cash">Dinheiro</option>
+                    <option value="Credit Card">Cartão de Crédito</option>
+                    <option value="Bank Transfer">Transferência Bancária</option>
+                    <option value="Others">Outros</option>
+                </select>
+                <input id="otherPaymentCondition" class="input-field hidden" type="text" placeholder="Especifique a condição" aria-label="Especifique a condição de pagamento">
+                <select id="downPayment" class="input-field" aria-label="Entrada">
+                    <option value="">Selecione...</option>
+                    <option value="Sim">Sim</option>
+                    <option value="Não">Não</option>
+                </select>
+                <div id="downPaymentDetails" class="hidden flex flex-col gap-4">
+                    <input id="downPaymentAmount" class="input-field" type="number" placeholder="Valor da Entrada" min="0" step="0.01" aria-label="Valor da Entrada">
+                    <input id="downPaymentDate" class="input-field" type="date" aria-label="Data do Pagamento do Sinal">
+                </div>
+                <select id="branch" class="input-field" aria-label="Filial">
+                    <option value="">Selecione a Filial</option>
+                    <option value="01">01-FILIAL 01 - STA.IFIGÊNIA, 625 (SÃO PAULO)</option>
+                    <option value="02">02-FILIAL 02 - STA.IFIGÊNIA 517 (SÃO PAULO)</option>
+                    <option value="03">03-FILIAL 03 - CASA VERDE 3031 (SÃO PAULO)</option>
+                    <option value="04">04-FILIAL 04 - General Osório, 282 (SÃO PAULO - GUARULHOS)</option>
+                    <option value="05">05-FILIAL 05 - Quinze de Novembro, 3935 (JOINVILLE)</option>
+                    <option value="06">06-FILIAL 06 - JOÃO BETTEGA 4801 (CURITIBA)</option>
+                    <option value="08">08-FILIAL 08 - AV. GETÚLIO VARGAS, 903 (JOINVILLE)</option>
+                    <option value="10">10-FILIAL 10 - Santa Rosália, 232 (SOROCABA)</option>
+                    <option value="11">11-FILIAL 11 - Senador Feijó, 414 (SANTOS)</option>
+                    <option value="12">12-FILIAL 12 - STA.IFIGÊNIA 591 (SÃO PAULO)</option>
+                    <option value="13">13-FILIAL 13 - STA.IFIGÊNIA 197 (SÃO PAULO)</option>
+                    <option value="14">14-FILIAL 14 - Paraibuna, 478 (SÃO JOSÉ)</option>
+                    <option value="15">15-FILIAL 15 - Visconde de Guarapuava, 2056 (CURITIBA)</option>
+                    <option value="16">16-FILIAL 16 - AV. DOS AUTONOMISTAS, 5946 (SÃO PAULO - OSASCO)</option>
+                    <option value="17">17-FILIAL 17 - Av. BRASIL, 4917 (MARINGÁ)</option>
+                    <option value="18">18-FILIAL 18 - RUA OSASCO 1548 (CAJAMAR)</option>
+                    <option value="20">20-FILIAL 20 - R SALTO GRANDE, 306 (CAMPINAS)</option>
+                    <option value="22">22-FILIAL 22 - RUA RIO DO BRACO, 200 (CD JOINVILLE)</option>
+                </select>
             </div>
         </div>
 
@@ -350,7 +401,7 @@
             </div>
             <div class="stats-card">
                 <div class="text-2xl font-bold text-orange-600" id="avgDifference">0%</div>
-                <div class="text-sm text-gray-600 mt-1">Diferença Média</div>
+                <div class="text-sm text-gray-600 mt-1">Economia Média</div>
             </div>
         </div>
 
@@ -392,7 +443,7 @@
                 <i class="fas fa-box text-green-600 mr-2"></i>
                 Adicionar Item para Cotação
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                 <div>
                     <input id="itemQuantity" class="input-field" type="number" placeholder="Quantidade *" min="0" required aria-label="Quantidade do item">
                     <p id="itemQuantityError" class="error-message hidden"></p>
@@ -404,10 +455,6 @@
                 <div>
                     <input id="itemDescription" class="input-field" type="text" placeholder="Descrição do Item *" required aria-label="Descrição do item">
                     <p id="itemDescriptionError" class="error-message hidden"></p>
-                </div>
-                <div>
-                    <input id="itemTargetPrice" class="input-field" type="number" placeholder="Preço Objetivo *" min="0" step="0.01" required aria-label="Preço objetivo do item">
-                    <p id="itemTargetPriceError" class="error-message hidden"></p>
                 </div>
             </div>
             <div id="priceInputs" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
@@ -471,8 +518,8 @@
                                 <th class="p-4 text-left">Descrição</th>
                                 <th class="p-4 text-center">Melhor Preço</th>
                                 <th class="p-4 text-center">Fornecedor</th>
-                                <th class="p-4 text-center">Objetivo</th>
-                                <th class="p-4 text-center">Diferença</th>
+                                <th class="p-4 text-center">Preço Médio</th>
+                                <th class="p-4 text-center">Economia (%)</th>
                                 <th class="p-4 text-center">Total</th>
                                 <th class="p-4 text-center no-print">Ações</th>
                             </tr>
@@ -528,6 +575,18 @@
                         <div>Economia/Excesso: <span id="summaryTotalSavings" class="font-medium">R$ 0,00</span></div>
                         <div>Percentual de economia: <span id="savingsPercentage" class="font-medium">0%</span></div>
                     </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">Condições de Pagamento</h4>
+                    <div class="text-sm" id="paymentConditionSummary">Não especificado</div>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">Entrada</h4>
+                    <div class="text-sm" id="downPaymentSummary">Não</div>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">Filial</h4>
+                    <div class="text-sm" id="branchSummary">Não selecionada</div>
                 </div>
             </div>
         </div>
@@ -641,12 +700,29 @@
                 showNotification("Nenhum dado para salvar no histórico", "error");
                 return;
             }
+            const paymentCondition = document.getElementById("paymentCondition").value;
+            const otherPaymentCondition = document.getElementById("otherPaymentCondition").value;
+            const finalPaymentCondition = paymentCondition === "Others" ? otherPaymentCondition : paymentCondition;
+            const downPayment = document.getElementById("downPayment").value;
+            let downPaymentAmount = null;
+            let downPaymentDate = null;
+            if (downPayment === "Sim") {
+                downPaymentAmount = parseFloat(document.getElementById("downPaymentAmount").value) || 0;
+                downPaymentDate = document.getElementById("downPaymentDate").value;
+            }
+            const branch = document.getElementById("branch").value;
+
             const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
             const quotation = {
                 id: generateUUID(),
                 date: new Date().toLocaleString('pt-BR'),
                 suppliers: suppliers,
-                comparisonData: comparisonData
+                comparisonData: comparisonData,
+                paymentCondition: finalPaymentCondition,
+                downPayment: downPayment,
+                downPaymentAmount: downPaymentAmount,
+                downPaymentDate: downPaymentDate,
+                branch: branch
             };
             history.push(quotation);
             localStorage.setItem('quotationHistory', JSON.stringify(history));
@@ -687,6 +763,36 @@
                 comparisonData = quotation.comparisonData;
                 updateSupplierTable();
                 updateComparisonTable();
+
+                const paymentCondition = quotation.paymentCondition || "";
+                const select = document.getElementById("paymentCondition");
+                const otherInput = document.getElementById("otherPaymentCondition");
+                if (["Cash", "Credit Card", "Bank Transfer", "Others"].includes(paymentCondition)) {
+                    select.value = paymentCondition;
+                    otherInput.classList.add("hidden");
+                    otherInput.value = "";
+                } else {
+                    select.value = "Others";
+                    otherInput.classList.remove("hidden");
+                    otherInput.value = paymentCondition;
+                }
+
+                const downPayment = quotation.downPayment || "";
+                const downPaymentAmount = quotation.downPaymentAmount || "";
+                const downPaymentDate = quotation.downPaymentDate || "";
+                const downPaymentSelect = document.getElementById("downPayment");
+                downPaymentSelect.value = downPayment;
+                const details = document.getElementById("downPaymentDetails");
+                if (downPayment === "Sim") {
+                    details.classList.remove("hidden");
+                    document.getElementById("downPaymentAmount").value = downPaymentAmount;
+                    document.getElementById("downPaymentDate").value = downPaymentDate;
+                } else {
+                    details.classList.add("hidden");
+                }
+
+                document.getElementById("branch").value = quotation.branch || "";
+
                 closeHistoryModal();
                 showNotification("Cotação restaurada com sucesso!");
             }
@@ -745,13 +851,15 @@
                 if (prices.length > 0) {
                     const bestPrice = Math.min(...prices.map(p => p.price));
                     const bestSupplier = prices.find(p => p.price === bestPrice).supplier;
-                    const saving = (item.targetPrice - bestPrice) * item.quantity;
-                    const difference = ((bestPrice / item.targetPrice) - 1) * 100;
+                    const sum = prices.reduce((acc, p) => acc + p.price, 0);
+                    const averagePrice = sum / prices.length;
+                    const saving = (averagePrice - bestPrice) * item.quantity;
+                    const difference = ((averagePrice - bestPrice) / averagePrice) * 100;
                     const itemTotal = bestPrice * item.quantity;
                     
                     totalSavings += saving;
                     totalValue += itemTotal;
-                    totalDifference += Math.abs(difference);
+                    totalDifference += difference;
                     supplierWins[bestSupplier] = (supplierWins[bestSupplier] || 0) + 1;
                 }
             });
@@ -766,7 +874,6 @@
             document.getElementById('avgDifference').textContent = 
                 totalItems > 0 ? `${(totalDifference / totalItems).toFixed(1)}%` : '0%';
 
-            // Atualizar resumo final
             document.getElementById('analysisDate').textContent = new Date().toLocaleDateString('pt-BR');
             document.getElementById('totalSuppliers').textContent = suppliers.length;
             document.getElementById('summaryTotalItems').textContent = totalItems;
@@ -776,6 +883,24 @@
                 totalSavings.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             document.getElementById('savingsPercentage').textContent = 
                 totalValue > 0 ? `${((totalSavings / totalValue) * 100).toFixed(1)}%` : '0%';
+
+            const paymentCondition = document.getElementById("paymentCondition").value;
+            const otherPaymentCondition = document.getElementById("otherPaymentCondition").value;
+            const finalPaymentCondition = paymentCondition === "Others" ? otherPaymentCondition : paymentCondition;
+            document.getElementById("paymentConditionSummary").textContent = finalPaymentCondition || "Não especificado";
+
+            const downPayment = document.getElementById("downPayment").value;
+            const downPaymentAmount = document.getElementById("downPaymentAmount").value;
+            const downPaymentDate = document.getElementById("downPaymentDate").value;
+            let downPaymentText = downPayment === "Sim" ? 
+                `Sim - ${parseFloat(downPaymentAmount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} em ${new Date(downPaymentDate).toLocaleDateString('pt-BR')}` : 
+                "Não";
+            document.getElementById("downPaymentSummary").textContent = downPaymentText;
+
+            const branch = document.getElementById("branch").value;
+            document.getElementById("branchSummary").textContent = branch ? 
+                document.getElementById("branch").options[document.getElementById("branch").selectedIndex].text : 
+                "Não selecionada";
         }
 
         // Gerar insights automáticos
@@ -791,19 +916,21 @@
             const insights = [];
             let supplierWins = {};
             let totalSavings = 0;
-            let itemsAboveTarget = 0;
+            let itemsWithSavings = 0;
 
             comparisonData.forEach(item => {
                 const prices = item.prices.filter(p => p.price > 0);
                 if (prices.length > 0) {
                     const bestPrice = Math.min(...prices.map(p => p.price));
                     const bestSupplier = prices.find(p => p.price === bestPrice).supplier;
-                    const saving = (item.targetPrice - bestPrice) * item.quantity;
+                    const sum = prices.reduce((acc, p) => acc + p.price, 0);
+                    const averagePrice = sum / prices.length;
+                    const saving = (averagePrice - bestPrice) * item.quantity;
                     
                     totalSavings += saving;
                     supplierWins[bestSupplier] = (supplierWins[bestSupplier] || 0) + 1;
                     
-                    if (bestPrice > item.targetPrice) itemsAboveTarget++;
+                    if (saving > 0) itemsWithSavings++;
                 }
             });
 
@@ -821,22 +948,16 @@
             if (totalSavings > 0) {
                 insights.push({
                     icon: 'fas fa-piggy-bank',
-                    text: `Economia total possível: ${totalSavings.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`,
+                    text: `Economia total possível em relação à média: ${totalSavings.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`,
                     type: 'success'
-                });
-            } else if (totalSavings < 0) {
-                insights.push({
-                    icon: 'fas fa-exclamation-triangle',
-                    text: `Orçamento pode exceder em ${Math.abs(totalSavings).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`,
-                    type: 'warning'
                 });
             }
 
-            if (itemsAboveTarget > 0) {
+            if (itemsWithSavings > 0) {
                 insights.push({
                     icon: 'fas fa-chart-line',
-                    text: `${itemsAboveTarget} item(ns) estão acima do preço objetivo. Considere negociar com os fornecedores.`,
-                    type: 'warning'
+                    text: `${itemsWithSavings} item(ns) apresentam economia em relação à média`,
+                    type: 'success'
                 });
             }
 
@@ -844,7 +965,6 @@
                 const div = document.createElement('div');
                 div.className = `flex items-center gap-3 p-3 rounded-lg ${
                     insight.type === 'success' ? 'bg-green-50 text-green-700' :
-                    insight.type === 'warning' ? 'bg-yellow-50 text-yellow-700' :
                     'bg-blue-50 text-blue-700'
                 }`;
                 div.innerHTML = `<i class="${insight.icon}"></i><span>${insight.text}</span>`;
@@ -884,12 +1004,14 @@
             
             comparisonData.forEach((item, index) => {
                 const prices = item.prices.filter(p => p.price > 0);
-                let bestPrice = 0, bestSupplier = '-', difference = 0, total = 0;
+                let bestPrice = 0, bestSupplier = '-', averagePrice = 0, savingsPercent = 0, total = 0;
                 
                 if (prices.length > 0) {
                     bestPrice = Math.min(...prices.map(p => p.price));
                     bestSupplier = prices.find(p => p.price === bestPrice).supplier;
-                    difference = ((bestPrice / item.targetPrice) - 1) * 100;
+                    const sum = prices.reduce((acc, p) => acc + p.price, 0);
+                    averagePrice = sum / prices.length;
+                    savingsPercent = ((averagePrice - bestPrice) / averagePrice) * 100;
                     total = bestPrice * item.quantity;
                 }
 
@@ -903,9 +1025,9 @@
                         ${bestPrice > 0 ? bestPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}
                     </td>
                     <td class="p-4 text-center">${bestSupplier}</td>
-                    <td class="p-4 text-center">${item.targetPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                    <td class="p-4 text-center font-bold ${difference < 0 ? 'success-text' : difference > 0 ? 'danger-text' : 'text-gray-600'}">
-                        ${difference !== 0 ? `${difference.toFixed(1)}%` : '-'}
+                    <td class="p-4 text-center">${averagePrice > 0 ? averagePrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}</td>
+                    <td class="p-4 text-center font-bold ${savingsPercent > 0 ? 'success-text' : 'text-gray-600'}">
+                        ${savingsPercent > 0 ? `${savingsPercent.toFixed(1)}%` : '-'}
                     </td>
                     <td class="p-4 text-center font-bold">
                         ${total > 0 ? total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}
@@ -925,7 +1047,7 @@
             updateStats();
             updateCharts();
             generateInsights();
-            saveQuotation(); // Salvar automaticamente após atualizar a tabela
+            saveQuotation();
         }
 
         // Lazy loading de gráficos
@@ -1026,7 +1148,9 @@
                 const prices = item.prices.filter(p => p.price > 0);
                 if (prices.length > 0) {
                     const bestPrice = Math.min(...prices.map(p => p.price));
-                    return (item.targetPrice - bestPrice) * item.quantity;
+                    const sum = prices.reduce((acc, p) => acc + p.price, 0);
+                    const averagePrice = sum / prices.length;
+                    return (averagePrice - bestPrice) * item.quantity;
                 }
                 return 0;
             });
@@ -1036,7 +1160,7 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Economia/Excesso (R$)',
+                        label: 'Economia (R$)',
                         data: savings,
                         backgroundColor: savings.map(s => s >= 0 ? '#48bb78' : '#c71d23'),
                         borderRadius: 6,
@@ -1072,7 +1196,7 @@
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return `${context.parsed.y >= 0 ? 'Economia' : 'Excesso'}: ${Math.abs(context.parsed.y).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`;
+                                    return `Economia: ${Math.abs(context.parsed.y).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`;
                                 }
                             }
                         }
@@ -1099,6 +1223,16 @@
             }
         }
 
+        function updatePrice(itemIndex, supplier, newPrice) {
+            const item = comparisonData[itemIndex];
+            const priceItem = item.prices.find(p => p.supplier === supplier);
+            if (priceItem) {
+                priceItem.price = parseFloat(newPrice) || 0;
+                updateComparisonTable();
+                showNotification("Preço atualizado com sucesso!");
+            }
+        }
+
         function showItemDetails(index) {
             const item = comparisonData[index];
             const modal = document.getElementById('itemModal');
@@ -1121,14 +1255,19 @@
                         <div class="space-y-2">
             `;
             
+            const prices = item.prices.filter(p => p.price > 0);
+            const bestPrice = prices.length > 0 ? Math.min(...prices.map(p => p.price)) : 0;
+            const sum = prices.reduce((acc, p) => acc + p.price, 0);
+            const averagePrice = prices.length > 0 ? sum / prices.length : 0;
+            
             item.prices.forEach(priceItem => {
                 if (priceItem.price > 0) {
-                    const isLowest = priceItem.price === Math.min(...item.prices.filter(p => p.price > 0).map(p => p.price));
+                    const isLowest = priceItem.price === bestPrice;
                     detailsHTML += `
                         <div class="flex justify-between items-center p-3 rounded-lg ${isLowest ? 'bg-green-50 border border-green-200' : 'bg-gray-50'}">
                             <span class="font-medium ${isLowest ? 'text-green-700' : ''}">${priceItem.supplier}</span>
                             <div class="flex items-center gap-2">
-                                <span class="font-bold ${isLowest ? 'text-green-600' : ''}">${priceItem.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                                <input type="number" value="${priceItem.price}" step="0.01" min="0" class="input-field w-24" onchange="updatePrice(${index}, '${priceItem.supplier}', this.value)">
                                 ${isLowest ? '<i class="fas fa-crown text-yellow-500"></i>' : ''}
                             </div>
                         </div>
@@ -1136,25 +1275,24 @@
                 }
             });
             
-            const bestPrice = Math.min(...item.prices.filter(p => p.price > 0).map(p => p.price));
             const total = bestPrice * item.quantity;
-            const saving = (item.targetPrice - bestPrice) * item.quantity;
+            const saving = (averagePrice - bestPrice) * item.quantity;
             
             detailsHTML += `
                         </div>
                     </div>
                     <div class="grid grid-cols-3 gap-4 pt-4 border-t">
                         <div class="text-center">
-                            <div class="text-sm text-gray-600">Preço Objetivo</div>
-                            <div class="text-lg font-bold">${item.targetPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                            <div class="text-sm text-gray-600">Preço Médio</div>
+                            <div class="text-lg font-bold">${averagePrice > 0 ? averagePrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}</div>
                         </div>
                         <div class="text-center">
                             <div class="text-sm text-gray-600">Total</div>
-                            <div class="text-lg font-bold text-blue-600">${total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                            <div class="text-lg font-bold text-blue-600">${total > 0 ? total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-sm text-gray-600">${saving >= 0 ? 'Economia' : 'Excesso'}</div>
-                            <div class="text-lg font-bold ${saving >= 0 ? 'text-green-600' : 'text-red-600'}">${Math.abs(saving).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                            <div class="text-sm text-gray-600">Economia</div>
+                            <div class="text-lg font-bold text-green-600">${saving > 0 ? saving.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}</div>
                         </div>
                     </div>
                 </div>
@@ -1218,9 +1356,22 @@
 
         // Exportação JSON
         function exportData() {
+            const paymentCondition = document.getElementById("paymentCondition").value;
+            const otherPaymentCondition = document.getElementById("otherPaymentCondition").value;
+            const finalPaymentCondition = paymentCondition === "Others" ? otherPaymentCondition : paymentCondition;
+            const downPayment = document.getElementById("downPayment").value;
+            const downPaymentAmount = document.getElementById("downPaymentAmount").value;
+            const downPaymentDate = document.getElementById("downPaymentDate").value;
+            const branch = document.getElementById("branch").value;
+
             const data = {
                 suppliers: suppliers,
                 comparisonData: comparisonData,
+                paymentCondition: finalPaymentCondition,
+                downPayment: downPayment,
+                downPaymentAmount: downPaymentAmount,
+                downPaymentDate: downPaymentDate,
+                branch: branch,
                 exportDate: new Date().toISOString(),
                 version: "2.0"
             };
@@ -1240,13 +1391,15 @@
         // Exportação CSV
         function exportCSV() {
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Quantidade,Unidade,Descrição,Melhor Preço,Fornecedor,Preço Objetivo,Diferença,Total\n";
+            csvContent += "Quantidade,Unidade,Descrição,Melhor Preço,Fornecedor,Preço Médio,Economia (%),Total\n";
             
             comparisonData.forEach(item => {
                 const prices = item.prices.filter(p => p.price > 0);
                 const bestPrice = prices.length > 0 ? Math.min(...prices.map(p => p.price)) : 0;
                 const bestSupplier = prices.length > 0 ? prices.find(p => p.price === bestPrice).supplier : '-';
-                const difference = prices.length > 0 ? ((bestPrice / item.targetPrice) - 1) * 100 : 0;
+                const sum = prices.reduce((acc, p) => acc + p.price, 0);
+                const averagePrice = prices.length > 0 ? sum / prices.length : 0;
+                const savingsPercent = prices.length > 0 ? ((averagePrice - bestPrice) / averagePrice) * 100 : 0;
                 const total = bestPrice * item.quantity;
                 
                 const row = [
@@ -1255,8 +1408,8 @@
                     `"${item.description}"`,
                     bestPrice.toFixed(2),
                     `"${bestSupplier}"`,
-                    item.targetPrice.toFixed(2),
-                    difference.toFixed(1),
+                    averagePrice.toFixed(2),
+                    savingsPercent.toFixed(1),
                     total.toFixed(2)
                 ].join(",");
                 csvContent += row + "\n";
@@ -1277,12 +1430,11 @@
         function importCSV(content) {
             const rows = content.split('\n').slice(1).filter(row => row.trim());
             comparisonData = rows.map(row => {
-                const [quantity, unit, description, bestPrice, supplier, targetPrice] = row.split(',').map(val => val.replace(/^"|"$/g, ''));
+                const [quantity, unit, description, bestPrice, supplier, averagePrice] = row.split(',').map(val => val.replace(/^"|"$/g, ''));
                 return {
                     quantity: parseInt(quantity),
                     unit,
                     description,
-                    targetPrice: parseFloat(targetPrice),
                     prices: suppliers.map(s => ({
                         supplier: s.nome,
                         price: s.nome === supplier ? parseFloat(bestPrice) : 0
@@ -1328,17 +1480,14 @@
             const quantityInput = document.getElementById("itemQuantity");
             const unitInput = document.getElementById("itemUnit");
             const descriptionInput = document.getElementById("itemDescription");
-            const targetPriceInput = document.getElementById("itemTargetPrice");
 
             const quantity = parseInt(quantityInput.value);
             const unit = sanitizeInput(unitInput.value.trim());
             const description = sanitizeInput(descriptionInput.value.trim());
-            const targetPrice = parseFloat(targetPriceInput.value);
 
             if (!validateField(descriptionInput, description, "Descrição é obrigatória")) return;
             if (!validateField(unitInput, unit, "Unidade é obrigatória")) return;
             if (!validateField(quantityInput, !isNaN(quantity) && quantity > 0, "Quantidade deve ser maior que 0")) return;
-            if (!validateField(targetPriceInput, !isNaN(targetPrice) && targetPrice > 0, "Preço objetivo deve ser maior que 0")) return;
 
             const prices = [];
             let hasValidPrice = false;
@@ -1359,7 +1508,6 @@
                 quantity: quantity,
                 unit: unit,
                 description: description,
-                targetPrice: targetPrice,
                 prices: prices
             });
 
@@ -1369,7 +1517,6 @@
             quantityInput.value = '';
             unitInput.value = '';
             descriptionInput.value = '';
-            targetPriceInput.value = '';
             suppliers.forEach((_, index) => {
                 document.getElementById(`itemPrice${index + 1}`).value = '';
             });
@@ -1379,13 +1526,53 @@
             document.getElementById("itemQuantity").value = '';
             document.getElementById("itemUnit").value = '';
             document.getElementById("itemDescription").value = '';
-            document.getElementById("itemTargetPrice").value = '';
             suppliers.forEach((_, index) => {
                 const input = document.getElementById(`itemPrice${index + 1}`);
                 if (input) input.value = '';
             });
             document.querySelectorAll('.input-field').forEach(input => input.classList.remove('input-error'));
             document.querySelectorAll('.error-message').forEach(error => error.classList.add('hidden'));
+        });
+
+        document.getElementById("clearAllBtn").addEventListener("click", () => {
+            if (confirm("Tem certeza que deseja limpar todos os dados?")) {
+                suppliers = [];
+                comparisonData = [];
+                updateSupplierTable();
+                updateComparisonTable();
+                document.getElementById("paymentCondition").value = "";
+                document.getElementById("otherPaymentCondition").value = "";
+                document.getElementById("otherPaymentCondition").classList.add("hidden");
+                document.getElementById("downPayment").value = "";
+                document.getElementById("downPaymentDetails").classList.add("hidden");
+                document.getElementById("downPaymentAmount").value = "";
+                document.getElementById("downPaymentDate").value = "";
+                document.getElementById("branch").value = "";
+                showNotification("Todos os dados foram limpos!");
+            }
+        });
+
+        document.getElementById("paymentCondition").addEventListener("change", function() {
+            const otherInput = document.getElementById("otherPaymentCondition");
+            if (this.value === "Others") {
+                otherInput.classList.remove("hidden");
+            } else {
+                otherInput.classList.add("hidden");
+                otherInput.value = "";
+            }
+            updateStats();
+        });
+
+        document.getElementById("downPayment").addEventListener("change", function() {
+            const details = document.getElementById("downPaymentDetails");
+            if (this.value === "Sim") {
+                details.classList.remove("hidden");
+            } else {
+                details.classList.add("hidden");
+                document.getElementById("downPaymentAmount").value = "";
+                document.getElementById("downPaymentDate").value = "";
+            }
+            updateStats();
         });
 
         document.getElementById("sortByPriceBtn").addEventListener("click", () => {
@@ -1431,6 +1618,28 @@
                         const data = JSON.parse(content);
                         if (data.suppliers) suppliers = data.suppliers;
                         if (data.comparisonData) comparisonData = data.comparisonData;
+                        if (data.paymentCondition) {
+                            const select = document.getElementById("paymentCondition");
+                            const otherInput = document.getElementById("otherPaymentCondition");
+                            if (["Cash", "Credit Card", "Bank Transfer", "Others"].includes(data.paymentCondition)) {
+                                select.value = data.paymentCondition;
+                                otherInput.classList.add("hidden");
+                                otherInput.value = "";
+                            } else {
+                                select.value = "Others";
+                                otherInput.classList.remove("hidden");
+                                otherInput.value = data.paymentCondition;
+                            }
+                        }
+                        if (data.downPayment) {
+                            document.getElementById("downPayment").value = data.downPayment;
+                            if (data.downPayment === "Sim") {
+                                document.getElementById("downPaymentDetails").classList.remove("hidden");
+                                document.getElementById("downPaymentAmount").value = data.downPaymentAmount || "";
+                                document.getElementById("downPaymentDate").value = data.downPaymentDate || "";
+                            }
+                        }
+                        if (data.branch) document.getElementById("branch").value = data.branch;
                     } else if (file.name.endsWith('.csv')) {
                         importCSV(content);
                     }
@@ -1447,7 +1656,7 @@
 
         // Filtro de itens
         document.getElementById("filterItemsBtn").addEventListener("click", () => {
-            const filter = prompt("Filtrar por (deixe vazio para mostrar todos):\n1. 'economia' - itens com economia\n2. 'excesso' - itens acima do objetivo\n3. texto - buscar na descrição", "");
+            const filter = prompt("Filtrar por (deixe vazio para mostrar todos):\n1. 'economia' - itens com economia\n2. texto - buscar na descrição", "");
             
             if (filter === null) return;
             
@@ -1463,14 +1672,9 @@
                     if (filter.toLowerCase() === 'economia') {
                         if (prices.length > 0) {
                             const bestPrice = Math.min(...prices.map(p => p.price));
-                            show = bestPrice < item.targetPrice;
-                        } else {
-                            show = false;
-                        }
-                    } else if (filter.toLowerCase() === 'excesso') {
-                        if (prices.length > 0) {
-                            const bestPrice = Math.min(...prices.map(p => p.price));
-                            show = bestPrice > item.targetPrice;
+                            const sum = prices.reduce((acc, p) => acc + p.price, 0);
+                            const averagePrice = sum / prices.length;
+                            show = bestPrice < averagePrice;
                         } else {
                             show = false;
                         }
