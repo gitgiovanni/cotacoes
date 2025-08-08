@@ -1569,16 +1569,18 @@
             }
         });
 
-        document.getElementById("paymentCondition").addEventListener("change", function() {
-            const otherInput = document.getElementById("otherPaymentCondition");
-            if (this.value === "Others") {
-                otherInput.classList.remove("hidden");
-            } else {
-                otherInput.classList.add("hidden");
-                otherInput.value = "";
-            }
-            updateStats();
-        });
+document.getElementById("paymentCondition").addEventListener("change", function() {
+    const otherContainer = document.getElementById("otherPaymentConditionContainer");
+    const otherInput = document.getElementById("otherPaymentCondition");
+    if (this.value === "Others") {
+        otherContainer.classList.remove("hidden");
+        otherInput.focus();
+    } else {
+        otherContainer.classList.add("hidden");
+        otherInput.value = "";
+    }
+    updateStats();
+});
 
         document.getElementById("downPayment").addEventListener("change", function() {
             const details = document.getElementById("downPaymentDetails");
