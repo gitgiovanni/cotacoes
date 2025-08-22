@@ -301,7 +301,6 @@
 </head>
 <body class="min-h-screen p-4">
     <div class="max-w-7xl mx-auto">
-        <!-- Header -->
         <div class="glass-card p-6 mb-6">
             <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
                 <div>
@@ -337,8 +336,7 @@
             </div>
         </div>
 
-        <!-- Detalhes da Cotação -->
-               <div class="glass-card p-6 mb-6 no-print">
+        <div class="glass-card p-6 mb-6 no-print">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">
                 <i class="fas fa-wallet text-blue-600 mr-2"></i>
                 Detalhes da Cotação
@@ -402,7 +400,6 @@
             </div>
         </div>
 
-        <!-- Estatísticas Resumo -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
             <div class="stats-card">
                 <div class="text-2xl font-bold primary-text" id="totalItems">0</div>
@@ -422,7 +419,6 @@
             </div>
         </div>
 
-        <!-- Formulário de Fornecedores -->
         <div class="glass-card p-6 mb-6 no-print">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold text-gray-800">
@@ -454,7 +450,6 @@
             </div>
         </div>
 
-        <!-- Formulário de Itens -->
         <div class="glass-card p-6 mb-6 no-print">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">
                 <i class="fas fa-box text-green-600 mr-2"></i>
@@ -475,8 +470,7 @@
                 </div>
             </div>
             <div id="priceInputs" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
-                <!-- Inputs de preços serão gerados dinamicamente -->
-            </div>
+                </div>
             <div class="flex gap-3">
                 <button id="addItemBtn" class="btn-primary" aria-label="Adicionar item">
                     <i class="fas fa-plus"></i> Adicionar Item
@@ -487,7 +481,6 @@
             </div>
         </div>
 
-        <!-- Tabela de Fornecedores -->
         <div class="glass-card p-6 mb-6">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">
                 <i class="fas fa-users primary-text mr-2"></i>
@@ -509,7 +502,6 @@
             </div>
         </div>
 
-        <!-- Tabela de Comparação -->
         <div class="glass-card p-6 mb-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold text-gray-800">
@@ -547,7 +539,6 @@
             </div>
         </div>
 
-        <!-- Gráficos -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div class="chart-container" id="supplierChartContainer">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Comparação por Fornecedor</h3>
@@ -559,7 +550,6 @@
             </div>
         </div>
 
-        <!-- Relatório de Insights -->
         <div class="glass-card p-6 mb-6" id="insightsPanel">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">
                 <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
@@ -570,7 +560,6 @@
             </div>
         </div>
 
-        <!-- Resumo Final para PDF -->
         <div class="glass-card p-6 mb-6" id="finalSummary">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">
                 <i class="fas fa-clipboard-check primary-text mr-2"></i>
@@ -609,7 +598,6 @@
         </div>
     </div>
 
-    <!-- Modal de Detalhes do Item -->
     <div id="itemModal" class="modal">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-4">
@@ -622,7 +610,6 @@
         </div>
     </div>
 
-    <!-- Modal de Histórico -->
     <div id="historyModal" class="modal">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-4">
@@ -648,7 +635,6 @@
         </div>
     </div>
 
-    <!-- Input de arquivo oculto -->
     <input type="file" id="fileInput" accept=".json,.csv" style="display: none;">
 
     <script>
@@ -1224,8 +1210,15 @@
 
         // Funções de manipulação de dados
         function removeSupplier(index) {
-            if (confirm('Tem certeza que deseja remover este fornecedor?')) {
+            if (confirm('Tem certeza que deseja remover este fornecedor? Todos os preços associados a ele serão removidos.')) {
+                const removedSupplierName = suppliers[index].nome;
                 suppliers.splice(index, 1);
+                
+                // Remove os preços de todos os itens para este fornecedor
+                comparisonData.forEach(item => {
+                    item.prices = item.prices.filter(p => p.supplier !== removedSupplierName);
+                });
+
                 updateSupplierTable();
                 updateComparisonTable();
                 showNotification('Fornecedor removido com sucesso!');
@@ -1238,6 +1231,28 @@
                 updateComparisonTable();
                 showNotification('Item removido com sucesso!');
             }
+        }
+
+        function addSupplierToItem(itemIndex) {
+            const select = document.getElementById('addSupplierSelect');
+            const supplierNameToAdd = select.value;
+
+            if (!supplierNameToAdd) {
+                showNotification("Selecione um fornecedor para adicionar.", "warning");
+                return;
+            }
+
+            const item = comparisonData[itemIndex];
+            
+            if (item.prices.some(p => p.supplier === supplierNameToAdd)) {
+                showNotification("Este fornecedor já tem um preço para este item.", "error");
+                return;
+            }
+
+            item.prices.push({ supplier: supplierNameToAdd, price: 0 });
+
+            showItemDetails(itemIndex);
+            showNotification(`Fornecedor '${supplierNameToAdd}' adicionado. Por favor, insira o preço.`, 'success');
         }
 
         function updatePrice(itemIndex, supplier, newPrice) {
@@ -1278,25 +1293,44 @@
             const averagePrice = prices.length > 0 ? sum / prices.length : 0;
             
             item.prices.forEach(priceItem => {
-                if (priceItem.price > 0) {
-                    const isLowest = priceItem.price === bestPrice;
-                    detailsHTML += `
-                        <div class="flex justify-between items-center p-3 rounded-lg ${isLowest ? 'bg-green-50 border border-green-200' : 'bg-gray-50'}">
-                            <span class="font-medium ${isLowest ? 'text-green-700' : ''}">${priceItem.supplier}</span>
-                            <div class="flex items-center gap-2">
-                                <input type="number" value="${priceItem.price}" step="0.01" min="0" class="input-field w-24" onchange="updatePrice(${index}, '${priceItem.supplier}', this.value)">
-                                ${isLowest ? '<i class="fas fa-crown text-yellow-500"></i>' : ''}
-                            </div>
+                const isLowest = priceItem.price > 0 && priceItem.price === bestPrice;
+                detailsHTML += `
+                    <div class="flex justify-between items-center p-3 rounded-lg ${isLowest ? 'bg-green-50 border border-green-200' : 'bg-gray-50'}">
+                        <span class="font-medium ${isLowest ? 'text-green-700' : ''}">${priceItem.supplier}</span>
+                        <div class="flex items-center gap-2">
+                            <input type="number" value="${priceItem.price}" step="0.01" min="0" class="input-field w-24 text-right" onchange="updatePrice(${index}, '${priceItem.supplier}', this.value)">
+                            ${isLowest ? '<i class="fas fa-crown text-yellow-500"></i>' : ''}
                         </div>
-                    `;
-                }
+                    </div>
+                `;
             });
+            detailsHTML += `</div>`; // Fecha space-y-2
+            
+            // Lógica para adicionar novos fornecedores ao item
+            const existingSuppliersForThisItem = item.prices.map(p => p.supplier);
+            const availableSuppliersToAdd = suppliers.filter(s => !existingSuppliersForThisItem.includes(s.nome));
+
+            if (availableSuppliersToAdd.length > 0) {
+                detailsHTML += `
+                    <div class="pt-4 mt-4 border-t">
+                        <h4 class="text-sm font-medium text-gray-700 mb-2">Incluir fornecedor cadastrado</h4>
+                        <div class="flex items-center gap-2">
+                            <select id="addSupplierSelect" class="input-field flex-grow">
+                                <option value="">Selecione...</option>
+                                ${availableSuppliersToAdd.map(s => `<option value="${s.nome}">${s.nome}</option>`).join('')}
+                            </select>
+                            <button onclick="addSupplierToItem(${index})" class="btn-secondary !py-3 !px-4 text-sm" aria-label="Adicionar fornecedor ao item">
+                                <i class="fas fa-plus mr-2"></i>Adicionar
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
             
             const total = bestPrice * item.quantity;
             const saving = (averagePrice - bestPrice) * item.quantity;
             
             detailsHTML += `
-                        </div>
                     </div>
                     <div class="grid grid-cols-3 gap-4 pt-4 border-t">
                         <div class="text-center">
